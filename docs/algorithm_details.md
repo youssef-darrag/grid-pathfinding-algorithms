@@ -9,6 +9,8 @@
 - Space Complexity: O(b^d)
 - Implementation Notes: Explores all nodes at the current depth before moving deeper
 
+---
+
 ## 2. DFS (Depth-First Search)
 - Search Strategy: Branch-by-branch exploration
 - Data Structure: Stack (LIFO)
@@ -17,6 +19,8 @@
 - Time Complexity: O(b^m), where m is maximum depth
 - Space Complexity: O(b×m)
 - Implementation Notes: Explores as far as possible along each branch before backtracking
+
+---
 
 ## 3. DLS (Depth-Limited Search)
 - Search Strategy: Depth-first search with a maximum depth limit
@@ -27,6 +31,8 @@
 - Space Complexity: O(b×l)
 - Implementation Notes: Prevents infinite loops in DFS
 
+---
+
 ## 4. IDS (Iterative Deepening Search)
 - Search Strategy: Repeated depth-limited DFS with increasing depth limits
 - Data Structure: Stack (for each DFS iteration)
@@ -36,6 +42,8 @@
 - Space Complexity: O(b×d)
 - Implementation Notes: Combines benefits of BFS (optimality) and DFS (memory efficiency)
 
+---
+
 ## 5. UCS (Uniform-Cost Search)
 - Search Strategy: Cost-based expansion
 - Data Structure: Priority queue (ordered by path cost)
@@ -44,6 +52,8 @@
 - Time Complexity: O(b^(1+⌊C/ε⌋)), where C is optimal cost, ε is minimum edge cost
 - Space Complexity: O(b^(1+⌊C*/ε⌋))
 - Implementation Notes: Generalization of BFS for non-uniform costs
+
+---
 
 ## 6. A* Search
 - Search Strategy: Best-first search using heuristic evaluation
