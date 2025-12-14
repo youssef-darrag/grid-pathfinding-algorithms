@@ -1,14 +1,9 @@
 from collections import deque
-from utils import Node, Direction, reconstruct_path, calculate_metrics
+from utils import Node, Direction, reconstruct_path, calculate_metrics, print_metrics
 from grid import Grid
 
 def breadth_first_search(grid: Grid):
-    """
-    Breadth-First Search on the grid using Node and Direction.
-
-    Returns:
-        Dictionary with performance metrics
-    """
+    
     start_node = Node(position=grid.start)
     goal_position = grid.goal
 
@@ -23,7 +18,7 @@ def breadth_first_search(grid: Grid):
         current_node = frontier.popleft()
         nodes_expanded += 1
 
-        # Goal check
+       
         if current_node.position == goal_position:
             path = reconstruct_path(current_node)
             return calculate_metrics(
@@ -36,7 +31,7 @@ def breadth_first_search(grid: Grid):
 
         explored.add(current_node.position)
 
-        # Expand neighbors in 4 directions
+      
         for direction in Direction:
             dr, dc = direction.value
             r, c = current_node.position
@@ -60,16 +55,11 @@ def breadth_first_search(grid: Grid):
         optimal_path_length=0
     )
 
-# ===========================
-# Example usage
-# ===========================
+
 if __name__ == "__main__":
-    g = Grid(rows=10, cols=10, obstacle_percent=0.2)
+    g = Grid()  
     result = breadth_first_search(g)
     
-    # Print the metrics
-    from utils import print_metrics
     print_metrics(result)
 
-    # Print the grid with path visualization
     g.print_grid(result['path'])
