@@ -1,38 +1,31 @@
-# dls.py
-from grid import Grid
-from utils import Node, reconstruct_path
-from typing import List, Tuple
+from networkx import MultiDiGraph
+from core.utils import reconstruct_path
 
-def dls(grid: Grid, limit: int) -> List[Tuple[int, int]]:
-    # Depth-Limited Search: stops when depth limit is reached
-    stack = [(Node(position=grid.start), 0)]  # (node, depth)
-    visited = set()
+
+def dls(
+    graph: MultiDiGraph,
+    start: int,
+    goal: int,
+    limit: int = 200,
+):
+    stack = [(start, 0)]
+    parent = {start: None}
 
     while stack:
-        current, depth = stack.pop()
+        current, current_depth = stack.pop()
 
-        # Check goal
-        if current.position == grid.goal:
-            return reconstruct_path(current)
+        if current == goal:
+            break
 
-        # Expand node only if depth limit allows
-        if depth < limit:
-            for neighbor in grid.get_neighbors(current.position):
-                if neighbor not in visited:
-                    stack.append(
-                        (Node(position=neighbor, parent=current), depth + 1)
-                    )
+        if current_depth >= limit:
+            continue
 
-            visited.add(current.position)
+        for neighbor in graph.neighbors(current):
+            if neighbor not in parent:
+                parent[neighbor] = current
+                stack.append((neighbor, current_depth + 1))
 
-    # No path found within the depth limit
-    return []
+    if goal not in parent:
+        return [], len(parent)
 
-if __name__ == "__main__":
-    grid = Grid(rows=8, cols=8, obstacle_percent=0.2)
-    grid.print_grid()
-
-    depth_limit = 5
-    path = dls(grid, depth_limit)  # run DLS
-    print(f"\nDLS Path (limit={depth_limit}):", path)
-    grid.print_grid(path=path)
+    return reconstruct_path(parent, goal), len(parent)
