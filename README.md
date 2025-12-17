@@ -1,177 +1,204 @@
-# 🗺️ Real-World Map Finding Visualizer
+# 🗺️ Pathfinding Algorithms Visualizer
 
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Tkinter](https://img.shields.io/badge/Tkinter-GUI-orange.svg)](https://docs.python.org/3/library/tkinter.html)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Open Issues](https://img.shields.io/github/issues/username/map-finding-visualizer)](https://github.com/username/map-finding-visualizer/issues)
+A comprehensive pathfinding visualization tool with **two modes**:
+1. **Real-World Map Mode** - Visualize algorithms on actual road networks using OSMnx
+2. **Grid Mode** - Classic grid-based pathfinding with Pygame
 
-An interactive desktop application built with Python and Tkinter that visualizes various pathfinding algorithms on real-world maps using OpenStreetMap data. Compare how different search algorithms (BFS, DFS, DLS, IDS, UCS, A*) explore and find paths between geographic locations.
+## 🎯 Features
 
+### Real-World Map Visualizer
+- 🗺️ Uses actual road networks from OpenStreetMap
+- 🖱️ Click-to-select start and goal points
+- 🎬 Step-by-step animation of algorithm exploration
+- 📊 Performance metrics and comparison
+- 🔍 Graph diagnostics and connectivity analysis
+- 🎯 Smart randomization for connected points
 
-## ✨ Features
-
-- **🌍 Real-World Maps**: Interactive maps using TkinterMapView with OpenStreetMap integration
-- **🔍 Multiple Algorithms**: Visualize 6 different pathfinding algorithms:
-  - Breadth-First Search (BFS)
-  - Depth-First Search (DFS)
-  - Depth-Limited Search (DLS)
-  - Iterative Deepening Search (IDS)
-  - Uniform Cost Search (UCS)
-  - A* Search
-- **🎨 Interactive GUI**: Clean, user-friendly interface with real-time visualization
-- **📊 Live Statistics**: Watch algorithm metrics update in real-time:
-  - Path distance
-  - Nodes explored
-  - Execution time
-  - Algorithm status
-- **📍 Location Search**: Search any address or coordinate worldwide
-- **⚙️ Customizable Settings**: Adjust algorithm parameters and visualization speed
+### Grid Visualizer
+- 🎮 Interactive Pygame visualization
+- 🎲 Random grid generation
+- 🔵 Real-time node exploration
+- 📈 Performance metrics
+- 🎨 Clean visual feedback
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.8 or higher
-- pip package manager
-- Tkinter
-
 ### Installation
 
-1. **Clone the repository**
 ```bash
-git clone https://github.com/youssef-darrag/grid-pathfinding-algorithms.git
-cd map-finding-visualizer
-```
+# Clone the repository
+git clone https://github.com/youssef-darrag/real-world-path-visualizer.git
+cd real-world-path-visualizer
 
-2. **Create and activate virtual environment** (recommended)
-```bash
-# On Windows
-python -m venv venv
-venv\Scripts\activate
-
-# On macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-3. **Install dependencies**
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-4. **Run the application**
+### Run Map Visualizer
+
 ```bash
-python main.py
+python3 src/main_map.py
 ```
 
-## 📋 Requirements
+### Run Grid Visualizer
 
-All dependencies are listed in `requirements.txt`:
-```
-tkintermapview==2.25.1
-osmnx==1.6.0
-networkx==3.1
+```bash
+python3 src/main_grid.py
 ```
 
-## 🎮 Usage Guide
+## 📚 Algorithms Implemented
 
-### 1. Launch the Application
-- Run `python3 main.py` from the command line
-- The main window will open with a world map
+Both visualizers support:
+- **A*** (A-Star) - Optimal, uses heuristic
+- **BFS** (Breadth-First Search) - Optimal, no heuristic
+- **DFS** (Depth-First Search) - Non-optimal
+- **UCS** (Uniform Cost Search) - Optimal
+- **DLS** (Depth-Limited Search) - Depth-bounded
+- **IDS** (Iterative Deepening Search) - Optimal
 
-### 2. Set Start and End Locations
-- **Method 1: Click on Map**
-  - Click the first time to set start point
-  - Click the second time to set end point
-- **Method 2: Search Address**
-  - Use the search bar to find locations
-  - Click "Set as Start" or "Set as End" buttons
-- **Method 2: Randomized search**
-  - Click Random Search button to choose 2 random points within 0.5km radius
-  - Click Smart Search button to choose 2 random points without breaking the rules of strongly connected components and DAGs
+## 🎮 Usage
 
-### 3. Select Algorithm
-- Choose from the algorithm dropdown:
-  - BFS (Breadth-First Search)
-  - DFS (Depth-First Search)
-  - DLS (Depth-Limited Search) - requires depth limit
-  - IDS (Iterative Deepening Search)
-  - UCS (Uniform Cost Search)
-  - A* (A Star) - with selectable heuristic
+### Map Visualizer
 
-### 5. Run Visualization
-- Click **"Find Path"** to start algorithm
-- Watch real-time exploration on map:
-  - **Green**: Start point
-  - **Red**: End point
-  - **Blue**: Explored nodes
-  - **Yellow**: Frontier nodes
-  - **Purple**: Final path
-- Click **Reload map** to reload a different part of the map
-- Use **Clear path** to clear current paths
-- Click **Clear All** to clear current visualization
+1. **Load a location** - Default: "Cairo, Egypt"
+2. **Set start/goal**:
+   - Click map to select points
+   - Use "Random" for random selection
+   - Use "Smart Random" for guaranteed connected points
+3. **Enable animation** (optional) - See real-time exploration
+4. **Select algorithm** - Choose from dropdown
+5. **Run** - Watch the algorithm find the path!
 
-### 6. View Results
-- Check statistics panel for:
-  - Algorithm status
-  - Path distance
-  - Nodes explored
-  - Execution time
-  - Color of path
-- Compare multiple algorithms by running them sequentially
+### Grid Visualizer
+
+1. **Launch** - Grid generates automatically
+2. **Click algorithm button** - A*, BFS, DFS, etc.
+3. **Watch visualization** - Blue nodes = explored, Yellow = path
+4. **New Grid** - Generate different maze
+5. **Reset** - Clear current visualization
+
+## 📊 Performance Metrics
+
+Both visualizers show:
+- **Execution time** (milliseconds)
+- **Nodes explored** (search space)
+- **Path length** (solution quality)
+- **Memory usage** (space complexity)
+- **Optimality** (is path optimal?)
 
 ## 🏗️ Project Structure
 
 ```
 grid-pathfinding-algorithms/
-│
-├── main.py                    # Application entry point
-├── requirements.txt           # Python dependencies
-├── README.md                  # This file
-├── map_data.graphml           # Cached map data
-│
-├── src/                       # Source code
-│   ├── algorithms/           # Algorithm implementations
-│   │   ├── __init__.py      # Package initialization
-│   │   ├── astar.py         # A* algorithm
-│   │   ├── bfs.py           # Breadth-First Search
-│   │   ├── dfs.py           # Depth-First Search
-│   │   ├── dls.py           # Depth-Limited Search
-│   │   ├── ids.py           # Iterative Deepening Search
-│   │   └── ucs.py           # Uniform Cost Search
-│   │
-│   ├── core/                 # Core functionality
-│   │   ├── __init__.py
-│   │   ├── map.py           # Map loading and management
-│   │   ├── map_diagnostics.py # Map analysis utilities
-│   │   └── utils.py         # Helper functions
-│   │
-│   └── gui/                  # Graphical User Interface
-│       └── window.py        # Main application window
-│
-├── cache/                    # Cache directory for map data
-├── docs/                     # Documentation
-└── venv/                     # Virtual environment (not in git)
+├── src/
+│   ├── main_map.py              # Map visualizer entry
+│   ├── main_grid.py             # Grid visualizer entry
+│   ├── algorithms/              # Map-based algorithms
+│   ├── gui/                     # Map visualizer UI
+│   ├── grid_visualizer/         # Grid visualizer
+│   └── core/                    # Shared utilities
+├── requirements.txt
+└── README.md
 ```
 
+## 🎨 Screenshots
 
-## 📊 Performance Tips
+### Real-World Map Mode
+- Interactive map with actual roads
+- Click-to-select points
+- Animated exploration
+- Multiple path comparison
 
-1. **Map Size**: Smaller areas (< 2km radius) load faster
-2. **Caching**: OSMrx caches downloaded maps locally
-3. **Step Delay**: Increase for smoother visualization on complex maps
-4. **Graph Simplification**: Reduce graph complexity for faster processing
+### Grid Mode
+- Classic grid visualization
+- Obstacle generation
+- Real-time algorithm animation
+- Performance comparison
 
-## 🚧 Known Limitations
+## 🔧 Configuration
 
-- **Large Maps**: Very large areas may slow down visualization
-- **Internet Required**: Needs internet for map tile loading (first time)
-- **Memory Usage**: Complex algorithms on large graphs use significant memory
-- **OSM Data Quality**: Dependent on OpenStreetMap completeness in area
+### Map Visualizer Settings
+- **Animation Speed**: Slow, Medium, Fast, Instant
+- **Debug Mode**: Show click snapping
+- **Grid Size**: Configurable in code
 
+### Grid Visualizer Settings
+- **Cell Size**: Default 35px
+- **Grid Dimensions**: 15×20
+- **Obstacle Density**: 20%
+
+## 📖 Algorithm Details
+
+### A* (A-Star)
+- **Optimal**: Yes
+- **Complete**: Yes
+- **Time**: O(b^d)
+- **Space**: O(b^d)
+- Uses Manhattan distance (grid) or Haversine distance (map)
+
+### BFS
+- **Optimal**: Yes (unweighted)
+- **Complete**: Yes
+- **Time**: O(b^d)
+- **Space**: O(b^d)
+- Explores level by level
+
+### DFS
+- **Optimal**: No
+- **Complete**: Yes (finite)
+- **Time**: O(b^m)
+- **Space**: O(bm)
+- Goes deep first
+
+### DLS
+- **Optimal**: No
+- **Complete**: NO
+- **Time**: O(b^l)
+- **Space**: O(bl)
+- DFS with depth limit
+
+### IDS
+- **Optimal**: YES (unweighted)
+- **Complete**: YES
+- **Time**: O(b^d)
+- **Space**: O(bd)
+- Repeated DLS with increasing limits
+
+### UCS
+- **Optimal**: Yes
+- **Complete**: Yes
+- **Time**: O(b^d)
+- **Space**: O(b^d)
+- Considers edge costs
+
+## 🐛 Troubleshooting
+
+### Map won't load
+- Check internet connection (first load downloads map)
+- Try different location
+- Check firewall settings
+
+### Grid visualizer won't start
+- Ensure Pygame is installed: `pip install pygame`
+- Check Python version (3.8+)
+
+### Animation freezing
+- Use "Fast" or "Instant" speed
+- Disable animation for large graphs
+- Reduce grid size
+
+## 👥 Authors
+
+Youssef  - [GitHub](https://github.com/youssef-darrag)
+Salma    - [GitHub](https://github.com/salmasamh)
+Hoda     - [GitHub](https://github.com/hudah-hamza)
+Yomna    - [GitHub](https://github.com/yomnazedan14-ux)
+Mahmoud  - [GitHub](https://github.com/MahmoudOmiesh)
+Mohammed - [GitHub](https://github.com/moohammedali)
 
 ## 🙏 Acknowledgments
 
-- [OpenStreetMap](ttps://github.com/youssef-darrag) contributors for free map data
-- [Tom Schimansky](https://github.com/TomSchimansky) for TkinterMapView
-- [Geoff Boeing](https://github.com/gboeing) for OSMnx
-- [NetworkX](https://networkx.org/) team for graph library
+- OSMnx for map data
+- tkintermapview for map widget
+- Pygame for grid visualization
+- NetworkX for graph operations
