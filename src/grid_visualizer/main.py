@@ -1,9 +1,8 @@
 import pygame
-import sys
 
 from .grid import Grid
 from .colors import BLACK
-from .config import DEFAULT_CELL_SIZE, DEFAULT_GRID_ROWS, DEFAULT_GRID_COLS, DEFAULT_OBSTACLE_PERCENT, PANEL_WIDTH, DEFAULT_ANIMATION_SPEED, FPS
+from .config import DEFAULT_CELL_SIZE, DEFAULT_GRID_ROWS, DEFAULT_GRID_COLS, DEFAULT_OBSTACLE_PERCENT, PANEL_WIDTH, DEFAULT_ANIMATION_SPEED, FPS, INFO_PANEL_HEIGHT
 from .ui_components import UIComponents, create_buttons
 from .algorithm_runner import AlgorithmRunner
 
@@ -21,7 +20,7 @@ class PathfindingVisualizer:
         self.grid_width = grid_cols * cell_size
         self.grid_height = grid_rows * cell_size
         self.window_width = self.grid_width + PANEL_WIDTH
-        self.window_height = self.grid_height
+        self.window_height = self.grid_height + INFO_PANEL_HEIGHT
 
         # Create window
         self.screen = pygame.display.set_mode((self.window_width, self.window_height))
@@ -64,6 +63,8 @@ class PathfindingVisualizer:
             self.algorithm_runner.run_ucs(self.buttons, self.current_algorithm)
         elif algorithm_name == "DLS":
             self.algorithm_runner.run_dls(self.buttons, self.current_algorithm)
+        elif algorithm_name == "IDS":
+            self.algorithm_runner.run_ids(self.buttons, self.current_algorithm)
 
         self.is_running = False
 
@@ -86,6 +87,8 @@ class PathfindingVisualizer:
             self.visualize_algorithm("UCS")
         elif self.buttons['dls'].collidepoint(mouse_pos):
             self.visualize_algorithm("DLS")
+        elif self.buttons['ids'].collidepoint(mouse_pos):
+            self.visualize_algorithm("IDS")
         elif self.buttons['reset'].collidepoint(mouse_pos):
             self.reset()
         elif self.buttons['new_grid'].collidepoint(mouse_pos):

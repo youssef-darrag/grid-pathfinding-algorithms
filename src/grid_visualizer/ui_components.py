@@ -26,6 +26,13 @@ class UIComponents:
         # Draw buttons
         self._draw_buttons(buttons, current_algorithm)
 
+        self._draw_info_panel(metrics)
+    
+    def _draw_info_panel(self, metrics):
+        """Draw info panel."""
+        info_panel_rect = pygame.Rect(0, self.grid_height, self.grid_width + PANEL_WIDTH, INFO_PANEL_HEIGHT)
+        pygame.draw.rect(self.screen, PANEL_BG, info_panel_rect)
+
         # Draw metrics
         if metrics:
             self._draw_metrics(metrics)
@@ -43,6 +50,7 @@ class UIComponents:
             'dfs': 'DFS',
             'ucs': 'UCS',
             'dls': 'DLS',
+            'ids': 'IDS',
             'reset': 'Reset',
             'new_grid': 'New Grid'
         }
@@ -69,10 +77,10 @@ class UIComponents:
 
     def _draw_metrics(self, metrics):
         """Draw performance metrics."""
-        y_offset = 380
+        y_offset = self.grid_height + 20
 
         metrics_title = self.font.render("Metrics", True, TEXT_COLOR)
-        self.screen.blit(metrics_title, (self.grid_width + BUTTON_PADDING, y_offset))
+        self.screen.blit(metrics_title, (self.grid_width * 0.5 + BUTTON_PADDING, y_offset))
         y_offset += 30
 
         # Format metrics text
@@ -94,14 +102,14 @@ class UIComponents:
 
         for text in metrics_text:
             surf = self.small_font.render(text, True, TEXT_COLOR)
-            self.screen.blit(surf, (self.grid_width + BUTTON_PADDING, y_offset))
+            self.screen.blit(surf, (self.grid_width * 0.5 + BUTTON_PADDING, y_offset))
             y_offset += 25
 
     def _draw_legend(self):
         """Draw color legend."""
-        legend_y = self.grid_height - 180
+        legend_y = self.grid_height + 20
         legend_title = self.font.render("Legend", True, TEXT_COLOR)
-        self.screen.blit(legend_title, (self.grid_width + BUTTON_PADDING, legend_y))
+        self.screen.blit(legend_title, (BUTTON_PADDING, legend_y))
         legend_y += 30
 
         legend_items = [
@@ -114,9 +122,9 @@ class UIComponents:
 
         for color, label in legend_items:
             pygame.draw.rect(self.screen, color,
-                           (self.grid_width + BUTTON_PADDING, legend_y, 20, 20))
+                           (BUTTON_PADDING, legend_y, 20, 20))
             text = self.small_font.render(label, True, TEXT_COLOR)
-            self.screen.blit(text, (self.grid_width + BUTTON_PADDING + 30, legend_y))
+            self.screen.blit(text, (BUTTON_PADDING + 30, legend_y))
             legend_y += 25
 
     def draw_grid(self, grid, visited, path, cell_size):
@@ -162,8 +170,9 @@ def create_buttons(grid_width):
         'dfs': pygame.Rect(x, y_start + 2*(BUTTON_HEIGHT + BUTTON_SPACING), button_width, BUTTON_HEIGHT),
         'ucs': pygame.Rect(x, y_start + 3*(BUTTON_HEIGHT + BUTTON_SPACING), button_width, BUTTON_HEIGHT),
         'dls': pygame.Rect(x, y_start + 4*(BUTTON_HEIGHT + BUTTON_SPACING), button_width, BUTTON_HEIGHT),
-        'reset': pygame.Rect(x, y_start + 5*(BUTTON_HEIGHT + BUTTON_SPACING) + 20, button_width, BUTTON_HEIGHT),
-        'new_grid': pygame.Rect(x, y_start + 6*(BUTTON_HEIGHT + BUTTON_SPACING) + 20, button_width, BUTTON_HEIGHT),
+        'ids': pygame.Rect(x, y_start + 5*(BUTTON_HEIGHT + BUTTON_SPACING), button_width, BUTTON_HEIGHT),
+        'reset': pygame.Rect(x, y_start + 6*(BUTTON_HEIGHT + BUTTON_SPACING) + 20, button_width, BUTTON_HEIGHT),
+        'new_grid': pygame.Rect(x, y_start + 7*(BUTTON_HEIGHT + BUTTON_SPACING) + 20, button_width, BUTTON_HEIGHT),
     }
 
     return buttons

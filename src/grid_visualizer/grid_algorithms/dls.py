@@ -1,9 +1,9 @@
 # dls.py
-from grid import Grid
-from utils import Node, reconstruct_path
+from ..grid import Grid
+from ..utils import Node, reconstruct_path
 from typing import List, Tuple
 
-def dls(grid: Grid, limit: int) -> List[Tuple[int, int]]:
+def dls(grid: Grid, limit: int, callback=None) -> List[Tuple[int, int]]:
     # Depth-Limited Search: stops when depth limit is reached
     stack = [(Node(position=grid.start), 0)]  # (node, depth)
     visited = set()
@@ -24,6 +24,9 @@ def dls(grid: Grid, limit: int) -> List[Tuple[int, int]]:
                     )
 
             visited.add(current.position)
+
+            if callback:
+                callback(visited.copy())
 
     # No path found within the depth limit
     return []

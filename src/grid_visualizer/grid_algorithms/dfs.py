@@ -1,9 +1,9 @@
 # dfs.py
-from grid import Grid
-from utils import Node, reconstruct_path
+from ..grid import Grid
+from ..utils import Node, reconstruct_path
 from typing import List, Tuple
 
-def dfs(grid: Grid) -> List[Tuple[int, int]]:
+def dfs(grid: Grid, callback=None) -> List[Tuple[int, int]]:
     stack = [Node(position=grid.start)]  # Initialize stack with the start node
     visited = set()                      # Keep track of visited positions
 
@@ -14,6 +14,10 @@ def dfs(grid: Grid) -> List[Tuple[int, int]]:
             return reconstruct_path(current)
         if current.position not in visited:
             visited.add(current.position)  # Mark current node as visited
+
+            if callback:
+                callback(visited.copy())
+
             for neighbor in grid.get_neighbors(current.position):
                 if neighbor not in visited:
                     # Add neighbor node to the stack

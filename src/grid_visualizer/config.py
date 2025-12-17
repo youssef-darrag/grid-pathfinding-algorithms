@@ -3,6 +3,7 @@ DEFAULT_CELL_SIZE = 35
 DEFAULT_GRID_ROWS = 15
 DEFAULT_GRID_COLS = 20
 PANEL_WIDTH = 250
+INFO_PANEL_HEIGHT = 200
 
 # Animation settings
 DEFAULT_ANIMATION_SPEED = 50  # milliseconds
@@ -17,4 +18,4 @@ BUTTON_SPACING = 10
 BUTTON_PADDING = 20
 
 # Available algorithms
-ALGORITHMS = ['astar', 'bfs', 'dfs', 'ucs', 'dls']
+ALGORITHMS = ['astar', 'bfs', 'dfs', 'ucs', 'dls', 'ids']

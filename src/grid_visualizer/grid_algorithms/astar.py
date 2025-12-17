@@ -1,7 +1,7 @@
 import heapq
 from typing import List, Tuple, Dict, Optional
-from grid import Grid
-from utils import Node, reconstruct_path
+from ..grid import Grid
+from ..utils import Node, reconstruct_path
 
 #! This uses euclidean distance
 
@@ -9,7 +9,7 @@ class AStarSearch:
     def __init__(self, grid: Grid):
         self.grid = grid
 
-    def search(self) -> Tuple[Optional[List[Tuple[int, int]]], Dict]:
+    def search(self, callback=None) -> Tuple[Optional[List[Tuple[int, int]]], Dict]:
         start = self.grid.start
         goal = self.grid.goal
 
@@ -26,7 +26,7 @@ class AStarSearch:
             position=start,
             parent=None,
             cost=0,  # g(n)
-            heuristic=self.grid.eulicadian_distance(start, goal)  # h(n)
+            heuristic=self.grid.euclidean_distance(start, goal)  # h(n)
         )
 
 
@@ -39,6 +39,8 @@ class AStarSearch:
         # Map positions to Node objects for easy access
         node_map = {start: start_node}
 
+        visited = set()
+
         while frontier:
             # Update max memory
             current_memory = len(nodes_in_memory)
@@ -47,6 +49,14 @@ class AStarSearch:
             # Get node with lowest f_score
             _, current_node = heapq.heappop(frontier)
             current_pos = current_node.position
+
+            if current_pos in visited:
+                continue
+
+            visited.add(current_pos)
+
+            if callback:
+                callback(visited.copy())
 
             # Remove from memory tracking
             if current_pos in nodes_in_memory:
@@ -81,7 +91,7 @@ class AStarSearch:
                     g_scores[neighbor_pos] = tentative_g_score
 
                     # Calculate heuristic (h(n))
-                    h_score = self.grid.euclidian_distance(neighbor_pos, goal)
+                    h_score = self.grid.euclidean_distance(neighbor_pos, goal)
 
                     # Create neighbor node
                     neighbor_node = Node(
@@ -189,5 +199,3 @@ def test_astar():
     return results
 
 
-if __name__ == "__main__":
-    test_astar()

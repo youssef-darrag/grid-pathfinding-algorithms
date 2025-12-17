@@ -1,9 +1,9 @@
 from collections import deque
-from utils import Node, Direction, reconstruct_path, calculate_metrics, print_metrics
-from grid import Grid
+from ..utils import Node, Direction, reconstruct_path, calculate_metrics
+from ..grid import Grid
 
-def breadth_first_search(grid: Grid):
 
+def breadth_first_search(grid: Grid, callback=None):
     start_node = Node(position=grid.start)
     goal_position = grid.goal
 
@@ -18,7 +18,6 @@ def breadth_first_search(grid: Grid):
         current_node = frontier.popleft()
         nodes_expanded += 1
 
-
         if current_node.position == goal_position:
             path = reconstruct_path(current_node)
             return calculate_metrics(
@@ -31,6 +30,8 @@ def breadth_first_search(grid: Grid):
 
         explored.add(current_node.position)
 
+        if callback:
+            callback(explored.copy())
 
         for direction in Direction:
             dr, dc = direction.value
@@ -60,6 +61,6 @@ if __name__ == "__main__":
     g = Grid()
     result = breadth_first_search(g)
 
-    print_metrics(result)
+    # print_metrics(result)
 
     g.print_grid(result['path'])

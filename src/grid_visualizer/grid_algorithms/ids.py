@@ -1,17 +1,22 @@
-from collections import deque
-from typing import List, Optional
-from grid import Grid
-from utils import Node, Direction, reconstruct_path, calculate_metrics, print_metrics
+from typing import  Optional
+from ..grid import Grid
+from ..utils import Node, Direction, reconstruct_path, calculate_metrics
 
-def iterative_deepening_search(grid: Grid, max_depth: int = 50) -> dict:
+def iterative_deepening_search(grid: Grid, max_depth: int = 50, callback=None) -> dict:
 
     nodes_expanded_total = 0
     max_nodes_in_memory_total = 0
     path = None
 
+    visited = set()
+
     def depth_limited_search(current_node: Node, depth: int) -> Optional[Node]:
         nonlocal nodes_expanded
         nodes_expanded += 1
+
+        visited.add(current_node.position)
+        if callback:
+            callback(visited.copy())
 
         if current_node.position == grid.goal:
             return current_node
@@ -54,6 +59,6 @@ if __name__ == "__main__":
     g = Grid(rows=6, cols=6, obstacle_percent=0.2)
     g.print_grid()
     metrics = iterative_deepening_search(g, max_depth=20)
-    print_metrics(metrics)
+    # print_metrics(metrics)
     if metrics['path_found']:
         g.print_grid(path=metrics['path'])

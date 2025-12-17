@@ -4,7 +4,7 @@ class UniformCostSearch:
     def __init__(self, grid):
         self.grid = grid
 
-    def search(self):
+    def search(self, callback=None):
         start = self.grid.start
         goal = self.grid.goal
 
@@ -24,6 +24,9 @@ class UniformCostSearch:
             if current_pos in visited:
                 continue
             visited.add(current_pos)
+
+            if callback:
+                callback(visited.copy())
 
             for neighbor in self.grid.get_neighbors(current_pos):
                 new_cost = current_cost + 1
