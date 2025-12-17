@@ -1,5 +1,6 @@
 import heapq
 import math
+import time
 from networkx import MultiDiGraph
 from core.utils import reconstruct_path
 
@@ -9,7 +10,16 @@ def astar(
     start: int,
     goal: int,
     nodes_data: dict[int, tuple[float, float]],
+    callback=None,
+    delay: float = 0.0,  # Not used but kept for compatibility
 ):
+    """
+    A* algorithm with optional step-by-step visualization.
+
+    Args:
+        callback: Function called with (current_node, visited_set) after each step
+        delay: Kept for compatibility (delay is handled in callback)
+    """
     pq = [(0, start)]
     g_score = {start: 0}
     parent = {start: None}
@@ -28,6 +38,10 @@ def astar(
 
         visited_set.add(current)
 
+        # Call callback for visualization (no sleep here)
+        if callback:
+            callback(current, visited_set.copy())
+
         for neighbor in graph.neighbors(current):
             edge_data = graph.get_edge_data(current, neighbor)[0]
             weight = edge_data.get("length", 1)
@@ -40,8 +54,6 @@ def astar(
 
                 # heuristic: euclidean distance
                 nx_lat, nx_lon = nodes_data[neighbor]
-
-                # *111000 converts rough degrees difference to meters
                 dist = math.sqrt((nx_lat - gx) ** 2 + (nx_lon - gy) ** 2) * 111000
 
                 f_score = new_g + dist

@@ -7,6 +7,8 @@ def dls(
     start: int,
     goal: int,
     limit: int = 200,
+    callback=None, 
+    delay: float = 0.0,
 ):
     stack = [(start, 0)]
     parent = {start: None}

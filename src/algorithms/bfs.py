@@ -1,15 +1,33 @@
 from collections import deque
-
+import time
 from networkx import MultiDiGraph
 from core.utils import reconstruct_path
 
 
-def bfs(graph: MultiDiGraph, start: int, goal: int):
+def bfs(graph: MultiDiGraph, start: int, goal: int, callback=None, delay: float = 0.0):
+    """
+    BFS algorithm with optional step-by-step visualization.
+
+    Args:
+        callback: Function called with (current_node, visited_set) after each step
+        delay: Kept for compatibility (delay is handled in callback)
+    """
     queue = deque([start])
     parent = {start: None}
+    visited_set = set()
 
     while queue:
         current = queue.popleft()
+
+        if current in visited_set:
+            continue
+
+        visited_set.add(current)
+
+        # Call callback for visualization (no sleep here)
+        if callback:
+            callback(current, visited_set.copy())
+
         if current == goal:
             break
 

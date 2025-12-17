@@ -1,10 +1,17 @@
 import heapq
+import time
 from networkx import MultiDiGraph
 from core.utils import reconstruct_path
 
 
-def ucs(graph: MultiDiGraph, start: int, goal: int):
-    # cost is total distance traveled from the start
+def ucs(graph: MultiDiGraph, start: int, goal: int, callback=None, delay: float = 0.0):
+    """
+    UCS algorithm with optional step-by-step visualization.
+
+    Args:
+        callback: Function called with (current_node, visited_set) after each step
+        delay: Kept for compatibility (delay is handled in callback)
+    """
     pq = [(0, start)]
     costs = {start: 0}
     parent = {start: None}
@@ -20,6 +27,10 @@ def ucs(graph: MultiDiGraph, start: int, goal: int):
             continue
 
         visited.add(current)
+
+        # Call callback for visualization (no sleep here)
+        if callback:
+            callback(current, visited.copy())
 
         for neighbor in graph.neighbors(current):
             edge_data = graph.get_edge_data(current, neighbor)[0]

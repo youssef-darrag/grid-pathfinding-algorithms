@@ -1,212 +1,277 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
-import tkintermapview
-import time
+"""
+Main Window - Simplified and modular with animation support
+"""
 
-from algorithms import ALGORITHMS, COMPARE_MODE, run_algorithm
-from core.map import Map
+import tkinter as tk
+from tkinter import messagebox
+
+from algorithms import COMPARE_MODE
+from gui.map_controller import MapController
+from gui.algorithm_executor import AlgorithmExecutor
+from gui.ui_builder import UIBuilder
+from core.map_diagnostics import get_graph_stats, format_diagnostic_report
 
 
 class PathfinderWindow:
+    """Main application window."""
+
     def __init__(self, root):
         self.root = root
-        self.root.title("Map Pathfinding Visualizer")
-        self.root.geometry("1280x720")
+        self.root.title("🗺️ Real-World Pathfinding Visualizer")
+        self.root.geometry("1400x850")  # Slightly taller for animation controls
 
-        self.map = Map()
-        self.start_node = None
-        self.goal_node = None
-
-        self._setup_ui()
-        self.root.after(100, lambda: self.load_map_action(force=False))
-
-    def load_map_action(self, force=False):
-        place = self.loc_entry.get()
-        self._set_status(f"Loading {place}...")
-        self.root.update()
-
-        success, msg = self.map.load_map(place, force)
-
-        print(success, msg)
-
-        if success:
-            # Center view
-            center = self.map.node_keys[0]
-            lat, lon = self.map.get_node_coords(center)
-            self.map_widget.set_position(lat, lon)
-            self.map_widget.set_zoom(9)
-            self.run_btn.config(state="normal")
-            self._set_status(f"✅ {msg}")
-        else:
-            self._set_status("❌ Load failed.")
-            messagebox.showerror("Error", msg)
-
-    def randomize_action(self):
-        if not self.map.graph:
-            return
-
-        self.start_node, self.goal_node = self.map.get_random_endpoints()
-
-        # Clear map
-        self.map_widget.delete_all_marker()
-        self.map_widget.delete_all_path()
-
-        # Draw markers
-        s_pos = self.map.get_node_coords(self.start_node)
-        g_pos = self.map.get_node_coords(self.goal_node)
-
-        self.map_widget.set_marker(
-            s_pos[0],
-            s_pos[1],
-            text="Start",
-            text_color="green",
-            marker_color_circle="green",
-        )
-        self.map_widget.set_marker(
-            g_pos[0], g_pos[1], text="Goal", text_color="red", marker_color_circle="red"
-        )
-        self._set_status("Points randomized.")
-
-    def run_pathfinding(self):
-        if not self.start_node or not self.goal_node:
-            return
-
-        algo = self.algo_var.get()
-        self.map_widget.delete_all_path()
-        self.root.update()
-
-        if algo == COMPARE_MODE:
-            self._run_comparison()
-        else:
-            result = self._run_single_algorithm(algo)
-            self._display_comparison_stats([result])
-
-    def _run_single_algorithm(self, algo, color="blue", width=5):
-        start_time = time.perf_counter()
-
-        # Run Algorithm
-        path, visited = run_algorithm(
-            algo,
-            self.map.graph,
-            self.start_node,
-            self.goal_node,
-            self.map.node_coords,
-        )
-
-        duration = (time.perf_counter() - start_time) * 1000
-
-        result = {
-            "name": algo,
-            "time_ms": duration,
-            "visited": visited,
-            "length_km": None,
-            "path_nodes": 0,
-            "color": color,
-        }
-
-        if path:
-            coords = self.map.get_path_coords(path)
-            self.map_widget.set_path(coords, color=color, width=width)
-            length = self.map.get_path_length(path)
-            result["length_km"] = length / 1000
-            result["path_nodes"] = len(path)
-
-        return result
-
-    def _run_comparison(self):
-        colors = ["blue", "red", "green", "purple"]
-        results = []
-
-        for i, name in enumerate(ALGORITHMS.keys()):
-            result = self._run_single_algorithm(
-                name, color=colors[i % len(colors)], width=3
-            )
-            results.append(result)
-
-        self._display_comparison_stats(results)
-
-    def _setup_ui(self):
+        # Configure grid
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
 
-        # -- Map Section --
-        self.map_frame = tk.Frame(self.root)
-        self.map_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        # Build UI
+        self._setup_ui()
 
-        self.map_widget = tkintermapview.TkinterMapView(self.map_frame, corner_radius=0)
-        self.map_widget.set_tile_server(
-            "https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga",
-            max_zoom=22,
+        # Initialize after UI is ready
+        self.root.after(100, self._initial_load)
+
+    def _setup_ui(self):
+        """Setup the user interface."""
+        # Create map widget
+        self.map_widget = UIBuilder.create_map_widget(self.root)
+
+        # Initialize controllers
+        self.map_ctrl = MapController(self.map_widget)
+        self.algo_exec = AlgorithmExecutor(self.map_ctrl, self.root)  # Pass root for UI updates
+
+        # Create controls panel
+        callbacks = {
+            "on_reload_map": self._on_reload_map,
+            "on_randomize": self._on_randomize,
+            "on_smart_randomize": self._on_smart_randomize,
+            "on_diagnose": self._on_diagnose,
+            "on_run": self._on_run_pathfinding,
+            "on_clear_paths": self._on_clear_paths,
+            "on_clear_all": self._on_clear_all,
+        }
+
+        self.controls, self.widgets = UIBuilder.create_controls_panel(
+            self.root, callbacks
         )
-        self.map_widget.pack(fill="both", expand=True)
 
-        # -- Controls Section --
-        self.controls = ttk.LabelFrame(self.root, text="Controls", padding=15)
-        self.controls.grid(row=1, column=0, sticky="ew", padx=10, pady=(0, 10))
-        self.controls.columnconfigure(1, weight=1)
+        # Set initial status
+        self._set_status("👋 Welcome! Loading map...")
 
-        # Inputs
-        ttk.Label(self.controls, text="Location:").grid(row=0, column=0, sticky="w")
-        self.loc_entry = ttk.Entry(self.controls, width=30)
-        self.loc_entry.insert(0, "Cairo, Egypt")
-        self.loc_entry.grid(row=0, column=1, sticky="w", padx=5)
+    def _initial_load(self):
+        """Load map on startup."""
+        self._load_map(force=False)
 
-        ttk.Button(
-            self.controls,
-            text="Reload Map (Online)",
-            command=lambda: self.load_map_action(force=True),
-        ).grid(row=0, column=2)
+    def _load_map(self, force=False):
+        """Load map data."""
+        location = self.widgets["location_entry"].get()
+        self._set_status(f"⏳ Loading {location}...")
+        self.root.update()
 
-        # Algo Select
-        ttk.Label(self.controls, text="Algorithm:").grid(row=1, column=0, sticky="w")
-        self.algo_var = tk.StringVar(value=list(ALGORITHMS.keys())[0])
-        self.algo_box = ttk.Combobox(
-            self.controls,
-            textvariable=self.algo_var,
-            values=list(ALGORITHMS.keys()) + [COMPARE_MODE],
-            state="readonly",
-        )
-        self.algo_box.grid(row=1, column=1, sticky="w", padx=5)
+        success, msg = self.map_ctrl.load_map(location, force)
 
-        # Action Buttons
-        btn_frame = ttk.Frame(self.controls)
-        btn_frame.grid(row=2, column=0, columnspan=3, pady=10, sticky="ew")
-        ttk.Button(
-            btn_frame, text="📍 Randomize Points", command=self.randomize_action
-        ).pack(side="left", padx=5)
-        self.run_btn = ttk.Button(
-            btn_frame, text="▶ START", command=self.run_pathfinding, state="disabled"
-        )
-        self.run_btn.pack(side="left", fill="x", expand=True, padx=5)
+        if success:
+            # Enable controls
+            self.widgets["run_btn"].config(state="normal")
+            self.widgets["random_btn"].config(state="normal")
+            self.widgets["smart_random_btn"].config(state="normal")
+            self.widgets["diagnose_btn"].config(state="normal")
 
-        # stats frame
-        self.stats_frame = ttk.LabelFrame(self.controls, text="Statistics", padding=5)
-        self.stats_frame.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(5, 0))
+            # Enable map clicking
+            self.map_widget.add_left_click_map_command(self._on_map_click)
 
-        self.stats_text = tk.Text(
-            self.stats_frame, height=5, font=("Consolas", 10), state="disabled"
-        )
-        self.stats_text.pack(fill="x", expand=True)
+            # Show stats
+            stats = get_graph_stats(self.map_ctrl.map.graph)
+            status = (
+                f"✅ {msg} | "
+                f"Nodes: {stats['nodes']:,} | "
+                f"Edges: {stats['edges']:,} | "
+                f"Components: {stats['weak_components']}"
+            )
+            if stats['weak_components'] > 1:
+                status += " ⚠️"
 
-    def _display_comparison_stats(self, results):
-        self.stats_text.config(state="normal")
-        self.stats_text.delete("1.0", tk.END)
+            self._set_status(status)
+        else:
+            self._set_status("❌ Load failed")
+            messagebox.showerror("Error", msg)
 
-        header = f"{'Algorithm':<10} {'Time (ms)':<12} {'Visited':<10} {'Path Nodes':<12} {'Distance (km)':<15} {'Color'}\n"
-        self.stats_text.insert(tk.END, header)
-        self.stats_text.insert(tk.END, "-" * 70 + "\n")
+    # Event Handlers
 
-        for r in results:
-            if r["length_km"]:
-                line = f"{r['name']:<10} {r['time_ms']:<12.2f} {r['visited']:<10} {r['path_nodes']:<12} {r['length_km']:<15.2f} {r['color']}\n"
+    def _on_reload_map(self):
+        """Handle reload map button."""
+        self._load_map(force=True)
+
+    def _on_map_click(self, coords):
+        """Handle map click."""
+        debug_mode = self.widgets["debug_var"].get()
+        success, msg = self.map_ctrl.handle_map_click(coords, debug_mode)
+
+        if success:
+            self._set_status(msg)
+            # Update mode label
+            if self.map_ctrl.click_mode == "goal":
+                self.widgets["mode_label"].config(
+                    text="Mode: Setting GOAL 🎯", foreground="red"
+                )
             else:
-                line = f"{r['name']:<10} {r['time_ms']:<12.2f} {r['visited']:<10} {'N/A':<12} {'No path':<15} {r['color']}\n"
-            self.stats_text.insert(tk.END, line)
+                self.widgets["mode_label"].config(
+                    text="Mode: Setting START 🟢", foreground="green"
+                )
+        else:
+            if "cancelled" not in msg.lower():
+                messagebox.showerror("Error", msg)
 
-        self.stats_text.config(state="disabled")
+    def _on_randomize(self):
+        """Handle randomize button."""
+        success, msg = self.map_ctrl.randomize_endpoints()
+        self._set_status(msg)
 
-    def _set_status(self, text):
-        self.stats_text.config(state="normal")
-        self.stats_text.delete("1.0", tk.END)
-        self.stats_text.insert(tk.END, text)
-        self.stats_text.config(state="disabled")
+    def _on_smart_randomize(self):
+        """Handle smart randomize button."""
+        self._set_status("🔍 Finding connected points...")
+        self.root.update()
+
+        success, msg = self.map_ctrl.smart_randomize_endpoints()
+
+        if not success:
+            messagebox.showerror(
+                "Error",
+                "Could not find connected points!\n"
+                "The graph might be too fragmented."
+            )
+
+        self._set_status(msg)
+
+    def _on_diagnose(self):
+        """Handle diagnose button."""
+        if not self.map_ctrl.map.graph:
+            messagebox.showwarning("Warning", "Please load a map first!")
+            return
+
+        stats = get_graph_stats(self.map_ctrl.map.graph)
+
+        if self.map_ctrl.start_node and self.map_ctrl.goal_node:
+            is_connected, diagnostic = self.map_ctrl.check_path_exists()
+            report = format_diagnostic_report(stats, diagnostic)
+        else:
+            report = format_diagnostic_report(stats)
+            report += "\n\n⚠️ No start/goal points selected yet"
+
+        UIBuilder.create_diagnostic_window(self.root, report)
+
+    def _on_run_pathfinding(self):
+        """Handle run pathfinding button."""
+        if not self.map_ctrl.start_node or not self.map_ctrl.goal_node:
+            messagebox.showwarning(
+                "Warning", "⚠️ Please set both start and goal points!"
+            )
+            return
+
+        # Check connectivity first
+        is_connected, diagnostic = self.map_ctrl.check_path_exists()
+
+        if not is_connected:
+            msg = "❌ No path exists between selected points!\n\n"
+            msg += "Reasons:\n"
+
+            if not diagnostic["start_exists"]:
+                msg += "• Start node not in graph\n"
+            if not diagnostic["goal_exists"]:
+                msg += "• Goal node not in graph\n"
+            if diagnostic["start_exists"] and diagnostic["goal_exists"]:
+                if not diagnostic["same_component"]:
+                    msg += f"• Different network components\n"
+                elif not diagnostic["path_exists"]:
+                    msg += "• No directed path (one-way streets)\n"
+
+            msg += "\n💡 Try 'Smart Random' button!"
+
+            result = messagebox.askyesno(
+                "Path Not Found", msg + "\n\nShow diagnostics?"
+            )
+            if result:
+                self._on_diagnose()
+            return
+
+        # Get animation settings
+        animate = self.widgets["animate_var"].get()
+        speed_delays = {
+            "Slow": 0.1,
+            "Medium": 0.05,
+            "Fast": 0.000001,
+            "Instant": 0.0
+        }
+        delay = speed_delays.get(self.widgets["speed_var"].get(), 0.0)
+
+        # Run algorithm(s)
+        algo = self.widgets["algorithm_var"].get()
+        self.map_ctrl.clear_paths()
+        self.root.update()
+
+        if algo == COMPARE_MODE:
+            self._run_comparison(animate, delay)
+        else:
+            self._run_single(algo, animate, delay)
+
+    def _run_single(self, algo_name, animate=False, delay=0.0):
+        """Run single algorithm."""
+        self._set_status(f"🔄 Running {algo_name}...")
+        self.root.update()
+
+        result = self.algo_exec.run_single_algorithm(
+            algo_name,
+            animate=animate,
+            delay=delay
+        )
+        formatted = AlgorithmExecutor.format_results([result])
+        self._set_status(formatted)
+
+    def _run_comparison(self, animate=False, delay=0.0):
+        """Run all algorithms for comparison."""
+        self._set_status("🔄 Running comparison...")
+        self.root.update()
+
+        results = self.algo_exec.run_comparison(animate=animate, delay=delay)
+        formatted = AlgorithmExecutor.format_results(results)
+        self._set_status(formatted)
+
+    def _on_clear_paths(self):
+        """Handle clear paths button."""
+        # Stop any running animation
+        if self.algo_exec.is_running:
+            self.algo_exec.stop_execution()
+            # Give time for animation to stop
+            self.root.after(100, lambda: self._do_clear_paths())
+        else:
+            self._do_clear_paths()
+
+    def _do_clear_paths(self):
+        """Actually clear the paths."""
+        self.map_ctrl.clear_paths()
+        self.algo_exec._clear_visited_markers()
+        self._set_status("🧹 Paths cleared")
+
+    def _on_clear_all(self):
+        """Handle clear all button."""
+        # Stop any running animation
+        if self.algo_exec.is_running:
+            self.algo_exec.stop_execution()
+            # Give time for animation to stop
+            self.root.after(100, lambda: self._do_clear_all())
+        else:
+            self._do_clear_all()
+
+    def _do_clear_all(self):
+        """Actually clear everything."""
+        self.map_ctrl.clear_all()
+        self.algo_exec._clear_visited_markers()
+        self.widgets["mode_label"].config(
+            text="Mode: Setting START 🟢", foreground="green"
+        )
+        self._set_status("🗑️ Map cleared | Click to set new points")
+
+    # Helper Methods
+
+    def _set_status(self, message):
+        """Update status text."""
+        UIBuilder.update_status(self.widgets["stats_text"], message)

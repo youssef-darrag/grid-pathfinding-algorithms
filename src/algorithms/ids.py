@@ -7,6 +7,8 @@ def ids(
     start: int,
     goal: int,
     max_depth: int = 200,
+    callback=None,
+    delay: float = 0.0,  
 ):
     total_explored = 0
 
