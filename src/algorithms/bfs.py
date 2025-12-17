@@ -5,10 +5,6 @@ from core.utils import reconstruct_path
 
 
 def bfs(graph: MultiDiGraph, start: int, goal: int, callback=None, delay: float = 0.0):
-<<<<<<< HEAD
-=======
-   
->>>>>>> 1c8340d706bac12688a0f806db4fdfa08c489184
     queue = deque([start])
     parent = {start: None}
     visited_set = set()

@@ -6,9 +6,7 @@ __pycache__/
 env/
 venv/
 cache/
-
 data/*.graphml
-
 .vscode/
 .idea/
 *.swp
