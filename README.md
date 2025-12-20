@@ -4,6 +4,8 @@ A comprehensive pathfinding visualization tool with **two modes**:
 1. **Real-World Map Mode** - Visualize algorithms on actual road networks using OSMnx
 2. **Grid Mode** - Classic grid-based pathfinding with Pygame
 
+---
+
 ## 🎯 Features
 
 ### Real-World Map Visualizer
@@ -20,6 +22,8 @@ A comprehensive pathfinding visualization tool with **two modes**:
 - 🔵 Real-time node exploration
 - 📈 Performance metrics
 - 🎨 Clean visual feedback
+
+---
 
 ## 🚀 Quick Start
 
@@ -46,6 +50,8 @@ python3 src/main_map.py
 python3 src/main_grid.py
 ```
 
+---
+
 ## 📚 Algorithms Implemented
 
 Both visualizers support:
@@ -55,6 +61,8 @@ Both visualizers support:
 - **UCS** (Uniform Cost Search) - Optimal
 - **DLS** (Depth-Limited Search) - Depth-bounded
 - **IDS** (Iterative Deepening Search) - Optimal
+
+---
 
 ## 🎮 Usage
 
@@ -77,6 +85,8 @@ Both visualizers support:
 4. **New Grid** - Generate different maze
 5. **Reset** - Clear current visualization
 
+---
+
 ## 📊 Performance Metrics
 
 Both visualizers show:
@@ -85,6 +95,8 @@ Both visualizers show:
 - **Path length** (solution quality)
 - **Memory usage** (space complexity)
 - **Optimality** (is path optimal?)
+
+---
 
 ## 🏗️ Project Structure
 
@@ -101,6 +113,8 @@ grid-pathfinding-algorithms/
 └── README.md
 ```
 
+---
+
 ## 🛩 INSIGHTS
 
 ### Real-World Map Mode
@@ -115,6 +129,8 @@ grid-pathfinding-algorithms/
 - Real-time algorithm animation
 - Performance comparison
 
+---
+
 ## 🔧 Configuration
 
 ### Map Visualizer Settings
@@ -126,6 +142,8 @@ grid-pathfinding-algorithms/
 - **Cell Size**: Default 35px
 - **Grid Dimensions**: 15×20
 - **Obstacle Density**: 20%
+
+---
 
 ## 📖 Algorithm Details
 
@@ -171,6 +189,8 @@ grid-pathfinding-algorithms/
 - **Space**: O(b^d)
 - Considers edge costs
 
+---
+
 ## 🐛 Troubleshooting
 
 ### Map won't load
@@ -187,6 +207,8 @@ grid-pathfinding-algorithms/
 - Disable animation for large graphs
 - Reduce grid size
 
+---
+
 ## 👥 Authors
 
 Youssef  - [GitHub](https://github.com/youssef-darrag) <br />
@@ -195,6 +217,8 @@ Hoda     - [GitHub](https://github.com/hudah-hamza)    <br />
 Yomna    - [GitHub](https://github.com/yomnazedan14-ux)<br />
 Mahmoud  - [GitHub](https://github.com/MahmoudOmiesh)  <br />
 Mohammed - [GitHub](https://github.com/moohammedali)   <br />
+
+---
 
 ## 🙏 Acknowledgments
 
